@@ -8,23 +8,66 @@
         <title></title>
     </head>
     <body>
-        <div id="user_id" style="text-align:center"></div>
+       <!--  <div id="user_id" style="text-align:center"></div>
+        <div style="float:left;margin-right:20px;">
+            <h4>グループ用の投稿欄</h4>
+            <textarea id="group-comment-entry" cols="40" rows="5" autofocus></textarea>
+        </div>
+        <div style="float:left">
+            <h4>全体用の投稿欄</h4>
+            <textarea id="comment-entry" cols="40" rows="5" autofocus></textarea>
+        </div> -->
+
         <!--名前と学生番号の入力欄-->
-        <div id="header-bar">
-            <div style="display: inline-block;">
-                <label style="font-weight: bold;">ニックネーム: <input type="text" maxlength="20" name="user_name" id="name-entry" placeholder="NO NAME" /></label>
+        <!-- <div style="font-weight:bold;color: black;float: right;">
+            <div>
+                <font size="3px">ニックネーム</font><input type="text" name="user_name" id="name-entry">
             </div>
-            <div class="form-toolbar" style="display: inline-block;">
-                <label style="font-weight: bold;">学生番号: <input type="text" maxlength="10" name="student_id" id="id-entry" placeholder="学生番号を入力して下さい..." /></label>
+            <div class="form-toolbar">
+                <font size="4px">学生番号</font><input type="text" name="student_id" id="id-entry">
             </div>
-            <!--
+            
             <div class="form-toolbar">
                 <input type="button" value="登録">
             </div>
-            -->
-        </div>
+            
+        </div> -->
+        <p>
+            <input type="checkbox" name="group" value="1">1
+            <input type="checkbox" name="group" value="2">2
+            <input type="checkbox" name="group" value="3">3
+            <input type="checkbox" name="group" value="4">4
+            <input type="checkbox" name="group" value="5">5
+            <input type="checkbox" name="group" value="6">6
+            <input type="checkbox" name="group" value="7">7
+            <input type="checkbox" name="group" value="8">8
+            <input type="checkbox" name="group" value="9">9
+            <input type="checkbox" name="group" value="10">10
+            <input type="checkbox" name="group" value="11">11
+            <input type="checkbox" name="group" value="12">12
+            <input type="checkbox" name="group" value="13">13
+            <input type="checkbox" name="group" value="14">14
+            <input type="checkbox" name="group" value="15">15
+            <input type="checkbox" name="group" value="16">16
+            <input type="checkbox" name="group" value="17">17
+            <input type="checkbox" name="group" value="18">18
+            <input type="checkbox" name="group" value="19">19
+            <input type="checkbox" name="group" value="20">20
+            <input type="checkbox" name="group" value="21">21
+            <input type="checkbox" name="group" value="22">22
+            <input type="checkbox" name="group" value="23">23
+            <input type="checkbox" name="group" value="24">24
+            <input type="checkbox" name="group" value="25">25
+            <input type="checkbox" name="group" value="26">26
+            <input type="checkbox" name="group" value="27">27
+            <input type="checkbox" name="group" value="28">28
+            <input type="checkbox" name="group" value="29">29
+            <input type="checkbox" name="group" value="30">30
+        </p>
+        <!-- <input type="button" onclick="check();" value="調べる"><br> -->
+        <div style="clear:both"></div>
 
-        <div id="column-container">
+        <div id="column-container" style="top: 7em;">
             <div class="column">
                 <div class="view_title">
                     <div id="group_name">
@@ -32,7 +75,6 @@
                     </div>
                 </div>
                 <div class="view">
-                    <textarea class="comment-entry" id="group-comment-entry" placeholder="書き込む..." autofocus></textarea>
                     <div id="group_comments"></div>
                 </div>
             </div>
@@ -51,7 +93,6 @@
                     <h3>全体投稿</h3>
                 </div>
                 <div class="view">
-                    <textarea class="comment-entry" id="comment-entry" placeholder="書き込む..." autofocus></textarea>
                     <div id="comments"></div>
                 </div>
             </div>
@@ -90,38 +131,57 @@
                     }
                 }
 
+                function selectGroup(post_gid){
+                    var checks = [];
+
+                    // チェックされているチェックボックのリストを返す
+                    $( "input:checked" ).map( function() {
+                        checks.push($(this).val());
+                    }).get().join(",");
+
+                    for(var i=0;i<checks.length;i++){
+                        if(parseInt(checks[i]) === parseInt(post_gid)){
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
                  // ユーザのグループid取得 (php使用)
+                 /*
                 function getUserID(unique_id){
                     var req = new XMLHttpRequest();
                     req.open("GET", "./php/getUserID.php?uid=../group_id/" + unique_id, false);
                     req.send(null);
-
+                    
                     if(req.responseText != false){
                         return eval(req.responseText);
                     }
-
+                    
                 }
+                */
 
-                function post_to_html(post){
-                    var body = post.body.replace(/\#GROUP-ONLY/ig, "");
-                    return '<div>\
-                              <div class="header">\
-                                <span class="number">' + post.post_num + '</span>\
-                                <span class="time">' + post.time + '</span>\
+                function makeText(msg){
+                    var content = msg.body.replace(/\#GROUP-ONLY/ig,"");
+                    var post_text = '<p tabindex="-1">\
+                            <div class="header">\
+                                <span class="number">' + msg.post_num + '</span>\
+                                <span class="time">' + msg.time + '</span>\
                                 <span class="host">\
-                                  <span class="host-name">' + post.post_user + '</span>\
-                                  &nbsp;\
-                                  <span class="ip-addr">(' + post.ip_addr + ')</span>\
+                                    <span class="host-name">' + msg.post_user + '</span>\
+                                    &nbsp;\
+                                    <span class="ip-addr">(' + msg.ip_addr + ')</span>\
                                 </span>\
-                              <div class="content">' + body + '</div>\
-                            </div>';
+                            </div>\
+                        <div class="content"><pre>' + content + '</pre></div>\
+                    </p>';
+
+                    return post_text;
                 }
 
                 // クライアントにCookieを保存する
+                /*
                 function setCookie(num){
-                    if (window.localStorage) {
-                        window.localStorage['serial_number'] = num;
-                    }
                     var s = "";
                     s = 'cookie_name={"serial_number":"' + num + '"};';
                     var expire = new Date();
@@ -131,9 +191,6 @@
                 }
                 // 該当するCookieを読み込む
                 function getCookie(){
-                    if (window.localStorage && window.localStorage['serial_number'] !== undefined) {
-                        return window.localStorage['serial_number'];
-                    }
                     var result = new Array();
                     if(document.cookie.length > 0){
                         var all_cookie = document.cookie;
@@ -148,16 +205,16 @@
                         return json.serial_number;
                     }
                 }
+                */
 
-                var new_posts = [];
                 var ws = null;
                 function startWebSocket() {
                     ws = new WebSocket("ws://" + window.location.hostname + ":9090/");
                     ws.onopen = function(){
+                        /*
                         var unique_id = getCookie();
                         var msg = "";
-                        console.log(typeof(getCookie()));
-
+                        // console.log(typeof(getCookie()));
                         if(typeof(unique_id) !== "undefined"){
                             msg = {'type': 'cookie', 'unique_id': unique_id};
                             var gname = getUserID(unique_id);
@@ -167,6 +224,7 @@
                         }
 
                         ws.send(JSON.stringify(msg));
+                        */
                     };
                     ws.onmessage = function(e) {
                         var msg = JSON.parse(e.data);
@@ -178,75 +236,37 @@
                         }
                         // 投稿の表示処理
                         else if (msg.type === "comment") {
-                            var my_id = getCookie();
-                            var my_gid = getUserID(my_id);
-                            post = post_to_html(msg);
+                            // var my_gid = getUserID(getCookie());
+                            post = makeText(msg);
 
                             if(msg.body.match(/\#GROUP-ONLY/i) === null){
                                 var p = $(post);
                                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, p[0]]);
-                                if (msg.ip_addr === my_id) {
-                                    $('#new_msg_notification').click();
-                                    p.prependTo('#comments');
-                                }
-                                else {
-                                    new_posts.push(p);
-                                    if ($('#new_msg_notification').length > 0) {
-                                        $('#new_msg_notification').text(new_posts.length + '件の新着');
-                                    }
-                                    else {
-                                        $('<div id="new_msg_notification">' + new_posts.length + '件の新着</div>').prependTo('#comments');
-                                        $('#new_msg_notification').on('click', function(e) {
-                                            $.each(new_posts, function(_, new_post) {
-                                                new_post.prependTo('#comments');
-                                            });
-                                            $(this).remove();
-                                        });
-                                    }
-                                }
+                                p.prependTo('#comments');
                             }else{
-                                if(parseInt(my_gid) === parseInt(msg.gid)){
+                                // console.log(selectGroup(msg.gid));
+                                // if(parseInt(my_gid) === parseInt(msg.gid)){
+                                if(selectGroup(msg.gid)){
                                     var p = $(post);
                                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, p[0]]);
                                     p.prependTo('#group_comments');
                                 }
                             }
-                        }
-                        else if (msg.type === "multiple-comments") {
-                            var my_gid = getUserID(getCookie());
-
-                            for (var i = 0; i < msg.comments.length; ++i) {
-                                var m = msg.comments[i];
-                                post = post_to_html(m);
-                                if(m.type === "only_TA"){
-                                    var p = $(post);
-                                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, p[0]]);
-                                    p.prependTo('#ta_comments');
-                                }else if(m.body.match(/\#GROUP-ONLY/i) === null){
-                                    var p = $(post);
-                                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, p[0]]);
-                                    p.prependTo('#comments');
-                                }else{
-                                    if(parseInt(my_gid) === parseInt(m.gid)){
-                                        var p = $(post);
-                                        MathJax.Hub.Queue(["Typeset", MathJax.Hub, p[0]]);
-                                        p.prependTo('#group_comments');
-                                    }
-                                }
-                            }
                         }else if (msg.type === "only_TA") {
-                            ta_post = post_to_html(msg);
+                            ta_post = makeText(msg);
                             var p = $(ta_post);
                             MathJax.Hub.Queue(["Typeset", MathJax.Hub, p[0]]);
                             p.prependTo('#ta_comments');
-                        }else if (msg.type === "cookie") {
+                        }
+                        /*
+                        else if (msg.type === "cookie") {
                             setCookie(msg.serial_num);
                             var gname = getUserID(msg.serial_num);
                             document.getElementById("group_name").innerHTML = "<h3>グループ No." + gname + " の投稿</h3>";
                         }else if(msg.type == "user_data"){
-                            $("#id-entry").val(msg.user_id);
-                            $("#name-entry").val(msg.user_name);
+                            document.getElementById("user_id").innerHTML = "ようこそ" + msg.user_name + "さん<br>あなたの学生番号は " + msg.user_id + " です";
                         }
+                        */
                         else if (msg.type === "draw") {
                             var ctx = $('.slide.current > canvas.overlay')[0].getContext('2d');
                             if (msg.shape === "line") {
@@ -282,6 +302,7 @@
                     updateSlideClasses();
                 });
 
+                /*
                 $('#comment-entry').on('keypress', function(e) {
                     if (!e.ctrlKey && e.which === 13) {
                         var s = $(this).val();
@@ -324,22 +345,29 @@
                         this.selectionEnd = start + 1;
                     }
                 });
-                 $('#name-entry').on('input', function(e) {
-                    var s = $(this).val();
-                    if (s.length > 0) {
-                        var id = getCookie();
-                        var msg = { 'type': 'user_name', 'uname': s , 'id':id};
-                        ws.send(JSON.stringify(msg));
+                 $('#name-entry').on('keypress', function(e) {
+                    if (e.which === 13) {
+                        var s = $(this).val();
+                        if (s.length > 0) {
+                            var id = getCookie();
+                            var msg = { 'type': 'user_name', 'uname': s , 'id':id};
+                            ws.send(JSON.stringify(msg));
+                        }
+                        e.preventDefault();
                     }
                 });
-                 $('#id-entry').on('input', function(e) {
-                    var s = $(this).val();
-                    if (s.length > 0) {
-                        var id = getCookie();
-                        var msg = { 'type': 'user_id', 'uid': s , 'id':id};
-                        ws.send(JSON.stringify(msg));
+                 $('#id-entry').on('keypress', function(e) {
+                    if (e.which === 13) {
+                        var s = $(this).val();
+                        if (s.length > 0) {
+                            var id = getCookie();
+                            var msg = { 'type': 'user_id', 'uid': s , 'id':id};
+                            ws.send(JSON.stringify(msg));
+                        }
+                        e.preventDefault();
                     }
                 });
+                */
             });
         </script>
     </body>

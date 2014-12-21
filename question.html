@@ -1,0 +1,164 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <script src="jquery-1.9.0.js"></script>
+        <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <title></title>
+    </head>
+    <body>
+        <div id="user_id" style="text-align:center"></div>
+
+        <!-- 質問事項 -->
+        <div id="QUESTION-FORM" style="height:80%; width:80%;">
+            <div style="height:100%; width:100%">
+                <form id="question1" style="border-style:double;">
+                    Q.「IPアドレスと検索ログ」の理解度を教えてください。
+                    <p>
+                    <input type="radio" name="choices" value="#qIP_Log_4">よく分かった
+                    <input type="radio" name="choices" value="#qIP_Log_3">ある程度分かった
+                    <input type="radio" name="choices" value="#qIP_Log_2">あまり分からなかった
+                    <input type="radio" name="choices" value="#qIP_Log_1">分からなかった
+                    </p>
+                    <input type="button" class="question-send" id="question1" value="送信">
+                </form>
+
+                 <form id="question2" style="border-style:double;">
+                    Q.「IPアドレスとクッキー」の理解度を教えてください。
+                    <p>
+                    <input type="radio" name="choices" value="#qIP_Cockie_4">よく分かった
+                    <input type="radio" name="choices" value="#qIP_Cockie_3">ある程度分かった
+                    <input type="radio" name="choices" value="#qIP_Cockie_2">あまり分からなかった
+                    <input type="radio" name="choices" value="#qIP_Cockie_1">分からなかった
+                    </p>
+                    <input type="button" class="question-send" id="question2" value="送信">
+                </form>
+
+                <form id="question3" style="border-style:double;">
+                    Q. 武雄市図書館とプライバシー問題に関する宿題はやってきましたか？(この回答は評価と無関係ですので、正直に答えてください)。
+                    <p>
+                    <input type="radio" name="choices" value="#qKadai_4">しっかりやってきた
+                    <input type="radio" name="choices" value="#qKadai_3">ある程度やってきた
+                    <input type="radio" name="choices" value="#qKadai_2">あまりやっていない
+                    <input type="radio" name="choices" value="#qKadai_1">やっていない
+                    </p>
+                    <input type="button" class="question-send" id="question3" value="送信">
+                </form>
+
+                <form id="question4" style="border-style:double;">
+                    Q. 掲示板は大人数の講義に有用かどうか、感想を教えてください。
+                    <p>
+                    <input type="radio" name="choices" value="#qKeijiban_4">有用である
+                    <input type="radio" name="choices" value="#qKeijiban_3">ある程度有用である
+                    <input type="radio" name="choices" value="#qKeijiban_2">あまり有用ではない
+                    <input type="radio" name="choices" value="#qKeijiban_1">有用ではない
+		    <br>
+		    その他、掲示板についてのコメントは以下に文章で入力してください(ハッシュタグの後に入力してください)。<br>
+                    <textarea name="comments" rows="4" cols="60"> #qKeijiban_Comments  </textarea>
+                    </p>
+                    <input type="button" class="question-send" id="question4" value="送信">
+                </form>
+
+            </div>
+        </div>
+ 
+        <script>
+            $(function() {
+
+                // クライアントにCookieを保存する
+                function setCookie(num){
+                    var s = "";
+                    s = 'cookie_name={"serial_number":"' + num + '"};';
+                    var expire = new Date();
+                    expire.setTime( expire.getTime() + 1000 * 3600 * 24 );
+                    s = s + 'expires=' + expire.toUTCString() + ';';
+                    document.cookie = s;
+                }
+                // 該当するCookieを読み込む
+                function getCookie(){
+                    var result = new Array();
+                    if(document.cookie.length > 0){
+                        var all_cookie = document.cookie;
+                        if(all_cookie != ''){
+                            cookies = all_cookie.split(';');
+                            for(var i = 0; i < cookies.length; i++){
+                                var cookie = cookies[i].split("=");
+                                result[cookie[0]] = decodeURIComponent(cookie[1]);
+                            }
+                        }
+                        var json = JSON.parse(result['cookie_name']);
+                        return json.serial_number;
+                    }
+                }
+
+                var ws = null;
+                function startWebSocket() {
+                    ws = new WebSocket("ws://" + window.location.hostname + ":9090/");
+                    /*
+                    ws.onopen = function(){
+                        var unique_id = getCookie();
+                        var msg = "";
+                        // console.log(typeof(getCookie()));
+
+                        if(typeof(unique_id) !== "undefined"){
+                            msg = {'type': 'cookie', 'unique_id': unique_id};
+                            var gname = getUserID(unique_id);
+                            document.getElementById("group_name").innerHTML = "<h3>グループ No." + gname + " の投稿</h3>";
+                        }else{
+                            msg = {'type': 'cookie', 'unique_id': "TA"};
+                        }
+
+                        ws.send(JSON.stringify(msg));
+                    };
+                    */
+                    ws.onmessage = function(e) {
+                        var msg = JSON.parse(e.data);
+                        if (msg.type === "cookie") {
+                            setCookie(msg.serial_num);
+                            var gname = getUserID(msg.serial_num);
+                            document.getElementById("group_name").innerHTML = "<h3>グループ No." + gname + " の投稿</h3>";
+                        }else if(msg.type == "user_data"){
+                            document.getElementById("user_id").innerHTML = "ようこそ" + msg.user_name + "さん<br>あなたの学生番号は " + msg.user_id + " です";
+                        }
+                        else if (msg.type === "draw") {
+                            var ctx = $('.slide.current > canvas.overlay')[0].getContext('2d');
+                            if (msg.shape === "line") {
+                                ctx.strokeStyle = 'black';
+                                ctx.lineWidth = 4;
+                                ctx.lineCap = 'round';
+                                ctx.lineJoin = 'round';
+
+                                var last_pos = msg.from;
+                                var pos = msg.to;
+                                ctx.moveTo(last_pos.x, last_pos.y);
+                                ctx.lineTo(pos.x, pos.y);
+                                ctx.stroke();
+                            }
+                        }
+                    };
+                    ws.onclose = function() {
+                        setTimeout(function() { startWebSocket(); }, 0);
+                    };
+                }
+                startWebSocket();
+
+                // アンケートの受信
+                $('.question-send').click(function(e){
+                    var btnid  = $(this).attr("id");
+                    var comment = $('#'+btnid+' [name=comments]').val();
+                    var val = $('#'+btnid+' [name=choices]:checked').val();
+                    if(typeof(val) !== 'undefined'){
+                        var id = getCookie();
+                        var msg = { 'type': 'question', 'body': val , 'id':id};
+                        ws.send(JSON.stringify(msg));
+
+                    }
+                    if(comment.length > 0){
+                        var id = getCookie();
+                        var com = { 'type': 'question', 'body': comment , 'id':id};
+                        ws.send(JSON.stringify(com));
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
